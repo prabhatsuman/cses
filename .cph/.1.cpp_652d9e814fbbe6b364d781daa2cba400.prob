@@ -1,0 +1,1 @@
+{"name":"Local: 1","url":"d:\\cses\\1.cpp","tests":[{"id":1694528901253,"input":"4 2\n1 3 3 1","output":""},{"id":1695984298863,"input":"3 2\n1 1 1","output":""},{"id":1695984702896,"input":"5 2\n2 3 2 3 2","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\cses\\1.cpp","group":"local","local":true}

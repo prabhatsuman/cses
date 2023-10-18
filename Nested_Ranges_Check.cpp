@@ -80,7 +80,7 @@ void solve()
     vector<int> ans1(n);
     for(int i=n-1;i>=0;i--)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
+        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1})>0;
         st.insert({v[i][1],i});
         
     }
@@ -89,7 +89,7 @@ void solve()
     vector<int> ans2(n);
     for(int i=0;i<n;i++)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
+        ans2[v[i][2]]=(i-st.order_of_key({v[i][1],-1}))>0;
 
         st.insert({v[i][1],i});
     }

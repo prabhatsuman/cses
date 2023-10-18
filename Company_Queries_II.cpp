@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -26,7 +21,7 @@ typedef vector<vl> vvl;
 #define read(v) for(auto &x:v) cin>>x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -55,47 +50,45 @@ typedef vector<vl> vvl;
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    int n,q;
+    cin>>n>>q;
+    vector<int> adj[n+1];
+    for(int i=0;i<n-1;i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int a;
+        cin>>a;
+        adj[a].pb(i+2);
+        adj[i+2].pb(a);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    vector<int> level(n+1,0);
+    function<void(int,int)> dfs=[&](int u,int par)
+    {
+        for(auto x:adj[u])
         {
-            if(a[0]==b[0])
+            if(x!=par)
             {
-                return a[1]>b[1];
+                level[x]=level[u]+1;
+                dfs(x,u);
             }
-            return a[0]<b[0];        
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
+    };
+    dfs(1,0);
+    vector<vector<int>> up(n+1,vector<int> (21,-1));
+    function<void(int,int)> solve=[&](int node,int par)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
-    }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
-    {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
-    }
-    printv(ans1);
-    printv(ans2);
-
+        up[node][0]=par;
+        for(auto child:adj[node])
+        {
+            if(child!=par)
+            {
+                for(int i=1;i<20;i++)
+                {
+                    up[child][i]=up[up[child][i-1]][i-1];
+                }
+            }
+        }
+    };
+    solve(1,-1);
 
 
 }

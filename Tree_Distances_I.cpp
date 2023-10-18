@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -56,54 +53,81 @@ typedef vector<vl> vvl;
 void solve()
 {
     int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    cin >> n;
+    vector<int> adj[n + 1];
+    for (int i = 0; i < n - 1; i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int u, v;
+        cin >> u >> v;
+        adj[u].pb(v);
+        adj[v].pb(u);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    vector<int> depth(n + 1, 0);
+    function<void(int, int)> dfs = [&](int node, int par)
+    {
+        for (auto child : adj[node])
         {
-            if(a[0]==b[0])
+            if (child != par)
             {
-                return a[1]>b[1];
+                dfs(child, node);
+                depth[node] = max(depth[node], 1 + depth[child]);
             }
-            return a[0]<b[0];        
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
+    };
+    dfs(1, 0);
+    vector<int> ans(n + 1, 0);
+    function<void(int, int, int)> solve = [&](int node, int par, int par_ans)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
+       
+        vector<int> preMax, sufMax;
+        int c = 0;
+        for (auto child : adj[node])
+        {
+            if (child == par)
+                continue;
+            preMax.pb(depth[child]);
+            sufMax.pb(depth[child]);
+            c++;
+        }
+      
+      
         
-    }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
+        
+        for (int i = 1; i < c; i++)
+        {
+            preMax[i] = max(preMax[i - 1], preMax[i]);
+        }
+        for (int i = c - 2; i >= 0; i--)
+        {
+            sufMax[i] = max(sufMax[i + 1], sufMax[i]);
+        }
+      
+        c = 0; // child_nos
+        for (auto child : adj[node])
+        {
+            if (child == par)
+                continue;
+            int c1 = (c == 0 ? -1e9 : preMax[c - 1]);
+            int c2 = (c == preMax.size()-1 ? -1e9 : sufMax[c + 1]);
+            // cout << c1 << " " << c2 << endl;
+            int partial_ans = 1 + max({c1, c2, par_ans});
+            solve(child, node, partial_ans);
+            c++;
+        }
+        ans[node] = 1 + max(par_ans, (preMax.empty() ? -1 : preMax.back()));
+    };
+    solve(1, 0, -1);
+    for (int i = 1; i <= n; i++)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
+        cout << ans[i] << " ";
     }
-    printv(ans1);
-    printv(ans2);
-
-
-
+    cout << endl;
 }
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t = 1;
 
     while (t--)
     {

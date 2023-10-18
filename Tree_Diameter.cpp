@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -56,54 +53,86 @@ typedef vector<vl> vvl;
 void solve()
 {
     int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    cin >> n;
+    vector<int> adj[n + 1];
+    for (int i = 0; i < n - 1; i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int u, v;
+        cin >> u >> v;
+        adj[u].pb(v);
+        adj[v].pb(u);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    vector<int> height(n + 1, 0);
+    function<int(int, int)> dfs = [&](int node, int par)
+    {
+        int ans = 0;
+        if (height[node] != 0)
         {
-            if(a[0]==b[0])
-            {
-                return a[1]>b[1];
-            }
-            return a[0]<b[0];        
+            return height[node];
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
+        for (auto child : adj[node])
+        {
+            if (child != par)
+            {
+                ans = max(ans, dfs(child, node) + 1);
+            }
+        }
+        return height[node] = ans;
+    };
+    dfs(1, 0);
+    // printv(height);
+    // cout << endl;
+
+    vector<int> dp(n + 1, 0);
+    function<void(int, int)> dfs2 = [&](int node, int par)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
+        priority_queue<int> pq;
+        int ans=0;
+        for(auto child:adj[node])
+        {
+            if(child!=par)
+            {                
+                pq.push(height[child]);
+            }
+        }
+        if(pq.size()>=2)
+        {
+            int first=pq.top();
+            pq.pop();
+            int second=pq.top();
+            pq.pop();
+            ans=2+first+second;
+        }
+        else if(pq.size()==1)
+        {
+            ans=1+pq.top();
+        }
+        dp[node]=ans;
+        for(auto child:adj[node])
+        {
+            if(child!=par)
+            {
+                // cout<<node<<" "<<child<<nline;
+                // cout<<dp[child]<<nline;
+                dfs2(child,node);
+                dp[node]=max(dp[node],dp[child]);
+            }
+        }
+
+
         
-    }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
-    {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
-    }
-    printv(ans1);
-    printv(ans2);
-
-
-
+       
+    };
+    dfs2(1, 0);
+    // printv(dp);
+    // cout << endl;
+    cout << dp[1] << nline;
 }
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t = 1;
 
     while (t--)
     {

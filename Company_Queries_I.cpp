@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -55,55 +52,59 @@ typedef vector<vl> vvl;
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    int n, q;
+    cin >> n >> q;
+    vector<int> adj[n + 1];
+    for (int i = 0; i < n - 1; i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int a;
+        cin >> a;
+        adj[i + 2].pb(a);
+        adj[a].pb(i + 2);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    vector<vector<int>> dp(n + 1, vector<int>(20, -1));
+    function<void(int, int)> dfs = [&](int node, int par)
+    { 
+        dp[node][0] = par;
+        for (int i = 1; i < 20; i++)
         {
-            if(a[0]==b[0])
-            {
-                return a[1]>b[1];
-            }
-            return a[0]<b[0];        
+            if (dp[node][i - 1] != -1)
+                dp[node][i] = dp[dp[node][i - 1]][i - 1];
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
+        for (auto child : adj[node])
+        {
+            if (child != par)
+            {
+                dfs(child, node);
+            }
+        }
+    };
+    dfs(1,-1);
+
+    
+    while (q--)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
+        int x, k;
+        cin >> x >> k;
+        int i = 0;
+        while (k > 0)
+        {
+
+            if (x != -1 && (k&1))
+            {
+                x = dp[x][i];
+            }
+            i++;
+            k >>= 1;
+        }
+        cout << x << endl;
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
-    {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
-    }
-    printv(ans1);
-    printv(ans2);
-
-
-
 }
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t = 1;
 
     while (t--)
     {

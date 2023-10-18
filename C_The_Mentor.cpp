@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -53,57 +50,89 @@ typedef vector<vl> vvl;
     cin.tie(NULL);
 
 /* -----------------------------Code Begins from here-------------------------------------------*/
+
+
+bool check(ll mid, vl &pos, vl &neg, ll k)
+{
+    ll pairct = 0;
+    ll n1 = neg.size() - 1;
+    ll p1 = pos.size() - 1;
+    ll x = neg.size() - 1;
+    
+    for (int i = 0; i < neg.size(); i++)
+    {
+        while (x >= 0 && neg[i] * neg[x] <= mid)
+        {
+            x--;
+        }
+        pairct += min(n1 - x, n1 - i);
+    }
+    x = 0;
+    for (int i = pos.size() - 1; i >= 0; i--)
+    {
+        while (x < pos.size() && pos[i] * pos[x] <= mid)
+        {
+            x++;
+        }
+        pairct += min(x, i*1LL);
+    }
+
+    x = pos.size() - 1;
+    for (int i = neg.size() - 1; i >= 0; i--)
+    {
+        while (x >= 0 && neg[i] * pos[x] <= mid)
+        {
+            x--;
+        }
+        pairct += (p1 - x);
+    }
+    return pairct >= k;
+}
+
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    ll n, k;
+    cin >> n >> k;
+    vl v(n);
+    read(v);
+    vl pos, neg;
+
+    for (int i = 0; i < n; i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
-    }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+        if (v[i]>= 0)
         {
-            if(a[0]==b[0])
-            {
-                return a[1]>b[1];
-            }
-            return a[0]<b[0];        
+            pos.pb(v[i]);
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
-    {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
+        else
+        {
+            neg.pb(v[i]);
+        }
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
+    sort(all(pos));
+    sort(all(neg));
+    ll l = -1e18, r = 1e18;
+    ll ans = 0;
+    while (l <= r)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
+        ll mid = r-(r-l)/2;
+     
+        if (check(mid, pos, neg, k))
+        {
+            ans = mid;
+            r = mid - 1;
+        }
+        else
+        {
+            l = mid + 1;
+        }
     }
-    printv(ans1);
-    printv(ans2);
-
-
-
+    cout << ans << nline;
 }
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t = 1;
 
     while (t--)
     {

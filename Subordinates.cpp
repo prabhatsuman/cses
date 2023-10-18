@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -26,7 +21,7 @@ typedef vector<vl> vvl;
 #define read(v) for(auto &x:v) cin>>x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -57,46 +52,33 @@ void solve()
 {
     int n;
     cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    vector<int> adj[n+1];
+    for(int i=0;i<n-1;i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int x;
+        cin>>x;
+        adj[x].push_back(i+2);
+        adj[i+2].push_back(x);
+
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    vector<int> dp(n+1,0);
+    function<void(int,int)>dfs=[&](int u,int p)
+    {
+        dp[u]=1;
+        for(auto v:adj[u])
         {
-            if(a[0]==b[0])
+            if(v!=p)
             {
-                return a[1]>b[1];
+                dfs(v,u);
+                dp[u]+=dp[v];
             }
-            return a[0]<b[0];        
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
+    };
+    dfs(1,0);
+    for(int i=1;i<=n;i++)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
+        cout<<dp[i]-1<<" ";
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
-    {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
-    }
-    printv(ans1);
-    printv(ans2);
-
-
 
 }
 

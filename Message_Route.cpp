@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -55,55 +52,56 @@ typedef vector<vl> vvl;
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    int n, m;
+    cin >> n >> m;
+    vector<int> adj[n + 1];
+    for (int i = 0; i < m; i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int u, v;
+        cin >> u >> v;
+        adj[u].pb(v);
+        adj[v].pb(u);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    queue<int> q;
+    vector<int> dist(n+1,1e9);
+    vector<int> par(n+1,-1);
+    q.push(1);
+    dist[1]=0;
+    while(!q.empty())
+    {
+        int node=q.front();
+        q.pop();
+        for(auto it:adj[node])
         {
-            if(a[0]==b[0])
+            if(dist[node]+1<dist[it])
             {
-                return a[1]>b[1];
+                dist[it]=dist[node]+1;
+                par[it]=node;
+                q.push(it);
             }
-            return a[0]<b[0];        
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
-    {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
+    if(dist[n]==1e9)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
+        print("IMPOSSIBLE");
+        return;
     }
-    printv(ans1);
-    printv(ans2);
-
-
-
+    vector<int> ans;
+    int node=n;
+    while(node!=-1)
+    {
+        ans.pb(node);
+        node=par[node];
+    }
+    reverse(all(ans));
+    print(ans.size());
+    printv(ans);
 }
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t = 1;
 
     while (t--)
     {

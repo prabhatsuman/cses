@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -26,7 +21,7 @@ typedef vector<vl> vvl;
 #define read(v) for(auto &x:v) cin>>x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -55,49 +50,45 @@ typedef vector<vl> vvl;
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    int n,m,q;
+    cin>>n>>m>>q;
+    vector<vector<ll>> dp(n+1,vector<ll>(n+1,1e18));
+    //floyd warshall algorithm
+    //O(n^3)
+    for(int i=0;i<m;i++)   
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int u,v,w;
+        cin>>u>>v>>w;
+        dp[u][v]=min(dp[u][v],(ll)w);
+        dp[v][u]=min(dp[u][v],(ll)w);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    for(int i=1;i<=n;i++)
+    {
+        dp[i][i]=0;
+    }
+    for(int k=1;k<=n;k++)
+    {
+        for(int i=1;i<=n;i++)
         {
-            if(a[0]==b[0])
+            for(int j=1;j<=n;j++)
             {
-                return a[1]>b[1];
+                dp[i][j]=min(dp[i][j],dp[i][k]+dp[k][j]);
             }
-            return a[0]<b[0];        
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
-    {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
+    while(q--)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
+        int a,b;
+        cin>>a>>b;
+        if(dp[a][b]!=1e18)
+        {
+            cout<<dp[a][b]<<nline;
+        }
+        else
+        {
+            cout<<-1<<nline;
+        }
     }
-    printv(ans1);
-    printv(ans2);
-
-
-
 }
 
 int main()

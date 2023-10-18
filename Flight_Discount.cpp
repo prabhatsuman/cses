@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -53,57 +50,82 @@ typedef vector<vl> vvl;
     cin.tie(NULL);
 
 /* -----------------------------Code Begins from here-------------------------------------------*/
+auto cmp = [](vector<ll> a, vector<ll> b)
+{
+    return a[0] < b[0];
+};
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+    int n, m;
+    cin >> n >> m;
+    vector<pair<int, int>> adj[n + 1];
+    for (int i = 0; i < m; i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        int u, v, w;
+        cin >> u >> v >> w;
+        adj[u].pb({v, w});
+        // adj[v].pb({u, w});
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    priority_queue<pair<ll,pair<ll,ll>>,vector<pair<ll,pair<ll,ll>>>,greater<pair<ll,pair<ll,ll>>>> pq;
+    pq.push({0, {1, 1}});
+    vector<ll> dist(n + 1, 1e18);
+    vector<ll> dist1(n + 1, 1e18);
+    dist[1] = 0;
+    dist1[1] = 0;
+    while (!pq.empty())
+    {
+        ll node = pq.top().second.first;
+        ll cost = pq.top().first;
+        ll flag = pq.top().second.second;
+        pq.pop();
+        if(flag)
         {
-            if(a[0]==b[0])
-            {
-                return a[1]>b[1];
-            }
-            return a[0]<b[0];        
+            if(dist[node]<cost)
+                continue;
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
-    {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
+        else
+        {
+            if(dist1[node]<cost)
+                continue;
+        }
+        // cout<<flag<<nline;
+        if (flag)
+        {
+            for (auto child : adj[node])
+            {
+                if (dist[child.first] > cost + child.second)
+                {
+                    dist[child.first] = cost + child.second;
+                    pq.push({dist[child.first], {child.first, 1}});
+                }
+                if (dist1[child.first] > cost + child.second / 2)
+                {
+                    dist1[child.first] = cost + child.second / 2;
+                    pq.push({dist1[child.first],{ child.first, 0}});
+                }
+            }
+        }
+        else
+        {
+            for (auto child : adj[node])
+            {
+                if (dist1[child.first] > cost + child.second)
+                {
+                    dist1[child.first] = cost + child.second;
+                    pq.push({dist1[child.first], {child.first, 0}});
+                }
+            }
+        }
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
-    {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
 
-        st.insert({v[i][1],i});
-    }
-    printv(ans1);
-    printv(ans2);
-
-
-
+    cout << min(dist1[n],dist[n]) << nline;
 }
+
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t = 1;
 
     while (t--)
     {

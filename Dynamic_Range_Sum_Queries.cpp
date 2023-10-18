@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -26,7 +21,7 @@ typedef vector<vl> vvl;
 #define read(v) for(auto &x:v) cin>>x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -53,50 +48,93 @@ typedef vector<vl> vvl;
     cin.tie(NULL);
 
 /* -----------------------------Code Begins from here-------------------------------------------*/
-void solve()
-{
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
+class SegmentTree{
+    vector<ll> tree;
+    int n; 
+    public:
+    SegmentTree(int n,vector<int> &v)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        this->n=n;
+        tree.resize(4*n);
+        build(v,0,n-1,0);
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
-        {
-            if(a[0]==b[0])
-            {
-                return a[1]>b[1];
-            }
-            return a[0]<b[0];        
-        }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
+    void build(vector<int> &v,int start,int end,int node)
     {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
+        if(start==end)
+        {
+            tree[node]=v[start];
+            return;
+        }
+        int mid=(start+end)/2;
+        build(v,start,mid,2*node+1);
+        build(v,mid+1,end,2*node+2);
+        tree[node]=tree[node*2+1]+tree[node*2+2];
+    }
+    ll  query(int left, int right)
+    {
+        return Query(left,right,0,n-1,0);
+    }
+    ll Query(int left, int right, int start,int end, int node)
+    {
+        if(left<=start && right>=end)
+        {
+            return tree[node];
+        }
+        if(left>end || right<start)
+        {
+            return 0;
+        }
+        int mid=(start+end)>>1;
+        ll ans1=Query(left,right,start,mid,2*node+1);
+        ll ans2=Query(left,right,mid+1,end,2*node+2);
+        return ans1+ans2;
+    }
+    void update(int index,int value)
+    {
+        Update(index,value,0,n-1,0);
+    }
+    void Update(int index,int value,int start,int end,int node)
+    {
+        if(start==end)
+        {
+            tree[node]=value;
+            return;
+        }
+        int mid=(start+end)>>1;
+        if(index<=mid)
+        {
+            Update(index,value,start,mid,2*node+1);
+        }
+        else
+        {
+            Update(index,value,mid+1,end,2*node+2);
+        }
+        tree[node]=tree[node*2+1]+tree[node*2+2];
         
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
+
+};
+void solve()
+{
+    int n,q;
+    cin>>n>>q;
+    vector<int> v(n);
+    read(v);
+    SegmentTree st(n,v);
+    while(q--)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
+        int a,b,c;
+        cin>>a>>b>>c;
+        if(a==1)
+        {
+            st.update(b-1,c);
+            v[b-1]=c;
+        }
+        else
+        {
+            cout<<st.query(b-1,c-1)<<nline;
+        }
     }
-    printv(ans1);
-    printv(ans2);
-
-
 
 }
 

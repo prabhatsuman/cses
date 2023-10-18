@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -26,7 +21,7 @@ typedef vector<vl> vvl;
 #define read(v) for(auto &x:v) cin>>x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -55,49 +50,28 @@ typedef vector<vl> vvl;
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
+    int n,x;
+    cin>>n>>x;
+    vi v(n);
+    read(v);
+   map<int,int> m;
     for(int i=0;i<n;i++)
     {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
+        m[v[i]]=i;
     }
-    sort(all(v),[]
-    
-        (vector<int> a,vector<int> b)
+    for(int i=0;i<n;i++)
+    {
+        for(int j=i+1;j<n;j++)
         {
-            if(a[0]==b[0])
+            int sum=x-v[i]-v[j];
+            if(m.find(sum)!=m.end() && m[sum]!=i && m[sum]!=j)
             {
-                return a[1]>b[1];
+                cout<<i+1<<" "<<j+1<<" "<<m[sum]+1;
+                return;
             }
-            return a[0]<b[0];        
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
-    {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
-    {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
-    }
-    printv(ans1);
-    printv(ans2);
-
-
-
+    cout<<"IMPOSSIBLE";
 }
 
 int main()

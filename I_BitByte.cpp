@@ -2,11 +2,6 @@
     Prabhat_007
 */
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/detail/standard_policies.hpp>
-#define ordered_set tree<pair<int,int>, null_type,less<pair<int,int>>, rb_tree_tag,tree_order_statistics_node_update>
-using namespace __gnu_pbds;
 #define ll long long
 #define M 1000000007
 #define nline '\n'
@@ -23,10 +18,12 @@ typedef vector<pi> vpi;
 typedef vector<pl> vpl;
 typedef vector<vi> vvi;
 typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
+#define read(v)       \
+    for (auto &x : v) \
+        cin >> x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";cout<<endl;
+        cout << v[i] << " ";
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -55,55 +52,54 @@ typedef vector<vl> vvl;
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n;
-    cin>>n;
-    vector<vector<int>> v(n,vector<int>(3));
-    for(int i=0;i<n;i++)
-    {
-        cin>>v[i][0];
-        cin>>v[i][1];
-        v[i][2]=i;
-    }
-    sort(all(v),[]
+    ll n, x1, x2;
+    cin >> n >> x1 >> x2;
+    string s;
+    cin >> s;
     
-        (vector<int> a,vector<int> b)
+    ll count = 0;
+    ll sum = 0;
+    for (ll i = 0; i < n; i++)
+    {
+        if (s[i] == '0')
         {
-            if(a[0]==b[0])
+            if (count > 1)
             {
-                return a[1]>b[1];
+                ll x = (count + 1) / 2;
+                sum += x * x1;
+                sum+=min(x2-x1,x1)*(count-x);
             }
-            return a[0]<b[0];        
+            else if (count == 1)
+            {
+                sum += x1;
+            }
+            // cont.pb(count);
+            count = 0;
         }
-    );
-    // print2d(v);
-    ordered_set st;
-    vector<int> ans1(n);
-    for(int i=n-1;i>=0;i--)
-    {
-        ans1[v[i][2]]=st.order_of_key({v[i][1]+1,-1});
-        st.insert({v[i][1],i});
-        
+        else
+        {
+            count++;
+        }
     }
-    st.clear();
-    // printv(ans1);
-    vector<int> ans2(n);
-    for(int i=0;i<n;i++)
+    if (count > 1)
     {
-        ans2[v[i][2]]=i-st.order_of_key({v[i][1],-1});
-
-        st.insert({v[i][1],i});
+        ll x = (count + 1) / 2;
+        sum += x * x1;
+        sum+=min(x2-x1,x1)*(count-x);
     }
-    printv(ans1);
-    printv(ans2);
-
-
-
+    else if (count == 1)
+    {
+        sum += x1;
+    }
+    cout << sum << endl;
+   
 }
 
 int main()
 {
     godspeed;
-    ll t=1;
+    ll t;
+    cin >> t;
 
     while (t--)
     {
