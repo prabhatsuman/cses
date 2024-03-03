@@ -1,140 +1,74 @@
-/*
-    Prabhat_007
-*/
 #include <bits/stdc++.h>
-#define ll long long
-#define M 1000000007
-#define nline '\n'
 using namespace std;
-ll count_of_digits(ll n);
-ll sum_of_digits(ll n);
-ll power(int a, int b);
-typedef vector<int> vi;
-#define all(v) (v).begin(), (v).end()
-typedef vector<ll> vl;
-typedef pair<int, int> pi;
-typedef pair<ll, ll> pl;
-typedef vector<pi> vpi;
-typedef vector<pl> vpl;
-typedef vector<vi> vvi;
-typedef vector<vl> vvl;
-#define read(v) for(auto &x:v) cin>>x;
-#define printv(v)                      \
-    for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";
-#define print2d(v)                            \
-    for (int i = 0; i < v.size(); i++)        \
-    {                                         \
-        for (int j = 0; j < v[i].size(); j++) \
-            cout << v[i][j] << " ";           \
-        cout << nline;                        \
-    }
-#define printp(v)                      \
-    for (int i = 0; i < v.size(); i++) \
-        cout << v[i].first << " " << v[i].second << nline;
-#define printm(m)                                  \
-    for (auto it = m.begin(); it != m.end(); it++) \
-        cout << it->first << " " << it->second << nline;
-#define prints(s)                                  \
-    for (auto it = s.begin(); it != s.end(); it++) \
-        cout << *it << " ";
-#define pb push_back
-#define print(x) cout << x << nline;
-#define print2(x, y) cout << x << " " << y << nline;
-#define yes cout << "YES" << nline;
-#define no cout << "NO" << nline;
-#define godspeed                      \
-    ios_base::sync_with_stdio(false); \
-    cin.tie(NULL);
-
-/* -----------------------------Code Begins from here-------------------------------------------*/
-void solve()
-{
-    int n,q;
-    cin>>n>>q;
-    vector<int> adj[n+1];
-    for(int i=0;i<n-1;i++)
-    {
-        int a;
-        cin>>a;
-        adj[a].pb(i+2);
-        adj[i+2].pb(a);
-    }
-    vector<int> level(n+1,0);
-    function<void(int,int)> dfs=[&](int u,int par)
-    {
-        for(auto x:adj[u])
-        {
-            if(x!=par)
-            {
-                level[x]=level[u]+1;
-                dfs(x,u);
-            }
-        }
-    };
-    dfs(1,0);
-    vector<vector<int>> up(n+1,vector<int> (21,-1));
-    function<void(int,int)> solve=[&](int node,int par)
-    {
-        up[node][0]=par;
-        for(auto child:adj[node])
-        {
-            if(child!=par)
-            {
-                for(int i=1;i<20;i++)
-                {
-                    up[child][i]=up[up[child][i-1]][i-1];
-                }
-            }
-        }
-    };
-    solve(1,-1);
-
-
-}
-
 int main()
 {
-    godspeed;
-    ll t=1;
-
-    while (t--)
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n, q;
+    cin >> n >> q;
+    vector<int> adj[n + 1];
+    for (int i = 2; i <= n; i++)
     {
-        solve();
+        int x;
+        cin >> x;
+        adj[x].push_back(i);
     }
-    return 0;
-}
-ll sum_of_digits(ll n)
-{
-    ll sum = 0;
-    while (n > 0)
+    vector<int> depth(n + 1, 0);
+    vector<int> parent(n + 1, 0);
+    function<void(int, int, int)> dfs = [&](int u, int p, int d)
     {
-        sum += n % 10;
-        n /= 10;
+        depth[u] = d;
+        parent[u] = p;
+        for (auto v : adj[u])
+        {
+            if (v != p)
+            {
+                dfs(v, u, d + 1);
+            }
+        }
+    };
+    dfs(1, 0, 0);
+    vector<vector<int>> dp(n + 1, vector<int>(30));
+    for (int i = 1; i <= n; i++)
+    {
+        dp[i][0] = parent[i];
     }
-    return sum;
-}
-ll count_of_digits(ll n)
-{
-    ll count = 0;
-    while (n > 0)
+    for (int bit = 1; bit <= 29; bit++)
     {
-        n /= 10;
-        count++;
+        for (int i = 1; i <= n; i++)
+        {
+            dp[i][bit] = dp[dp[i][bit - 1]][bit - 1];
+        }
     }
-    return count;
-}
-ll power(int a, int b)
-{
-    if (b == 0)
-        return 1;
-    ll res = power(a, b / 2);
-    if (b & 1)
+    while (q--)
     {
-        return (a * (res * res) % M) % M;
-    }
-    else
-    {
-        return (res * res) % M;
+        int a, b;
+        cin >> a >> b;
+        if (depth[a] < depth[b])
+        {
+            swap(a, b);
+        }
+        int diff = depth[a] - depth[b];
+        for (int bit = 0; bit <= 29; bit++)
+        {
+            if (diff & (1 << bit))
+            {
+                a = dp[a][bit];
+            }
+        }
+        if (a == b)
+        {
+            cout << a << endl;
+            continue;
+        }
+        for (int bit = 29; bit >= 0; bit--)
+        {
+            if (dp[a][bit] != dp[b][bit])
+            {
+                a = dp[a][bit];
+                b = dp[b][bit];
+            }
+        }
+        cout << parent[a] << endl;
     }
 }
