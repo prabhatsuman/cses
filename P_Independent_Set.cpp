@@ -31,62 +31,59 @@ typedef vector<ll> vl;
 #define godspeed                      \
     ios_base::sync_with_stdio(false); \
     cin.tie(NULL);
- 
+#define int long long 
+
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n, m;
-    cin >> n >> m;
-    vector<pair<int, int>> adj[n + 1];
-    vector<int> degree(n + 1, 0);
-    for (int i = 0; i < m; i++)
+    int n;
+    cin >> n;
+    vector<int> adj[n + 1];
+    for (int i = 0; i < n - 1; i++)
     {
         int u, v;
         cin >> u >> v;
-        adj[u].push_back({v, i});
-        adj[v].push_back({u, i});
-        degree[u]++;
-        degree[v]++;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
     }
-    for (int i = 1; i <= n; i++)
+    adj[0].push_back(1);
+    adj[1].push_back(0);
+    int dp[n + 1][2];
+    memset(dp, -1, sizeof(dp));
+    function<int(int, int, int)> dfs = [&](int node, int par, int flag) -> int
     {
-        if (degree[i] & 1)
+        int &ans = dp[node][flag];
+        if (~ans)
         {
-            cout << "IMPOSSIBLE" << endl;
-            return;
+            return dp[node][flag];
         }
-    }
-    vector<int> ans;
-    vector<bool> vis(m, false);
-    function<void(int)> dfs = [&](int node) -> void
-    {
-        for (auto it : adj[node])
+        ans = 1;
+        for (auto child : adj[node])
         {
-            if (vis[it.second])
-            {
+            if (child == par)
                 continue;
+            if (flag)
+            {
+                ans = (ans * (dfs(child, node, false) + dfs(child, node, true))) % M;
             }
-            vis[it.second] = true;
-            dfs(it.first);
+            else
+            {
+                ans = (ans * dfs(child, node, true)) % M;
+            }
         }
-        ans.push_back(node);
+        return ans;
     };
-    dfs(1);
-    if(ans.size()!=m+1)
-    {
-        cout<<"IMPOSSIBLE"<<endl;
-        return;
-    }
-    for (int it : ans)
-    {
-        cout << it << " ";
-    }
+    int ans = dfs(1, 0, true) + dfs(1, 0, false);
+    ans %= M;
+    cout << ans << endl;
 }
- 
-int main()
+
+signed main()
 {
     godspeed;
     ll t = 1;
+    // cin >> t;
+
     while (t--)
     {
         solve();

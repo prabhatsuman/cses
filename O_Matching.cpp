@@ -9,13 +9,10 @@ using namespace std;
 typedef vector<int> vi;
 #define all(v) (v).begin(), (v).end()
 typedef vector<ll> vl;
-#define read(v)       \
-    for (auto &x : v) \
-        cin >> x;
+#define read(v) for(auto &x:v) cin>>x;
 #define printv(v)                      \
     for (int i = 0; i < v.size(); i++) \
-        cout << v[i] << " ";           \
-    cout << nline;
+        cout << v[i] << " ";cout<<nline;
 #define print2d(v)                            \
     for (int i = 0; i < v.size(); i++)        \
     {                                         \
@@ -31,62 +28,41 @@ typedef vector<ll> vl;
 #define godspeed                      \
     ios_base::sync_with_stdio(false); \
     cin.tie(NULL);
- 
+
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
-    int n, m;
-    cin >> n >> m;
-    vector<pair<int, int>> adj[n + 1];
-    vector<int> degree(n + 1, 0);
-    for (int i = 0; i < m; i++)
+    int n;
+    cin>>n;
+    int mat[n][n];
+    for(int i=0;i<n;i++)
     {
-        int u, v;
-        cin >> u >> v;
-        adj[u].push_back({v, i});
-        adj[v].push_back({u, i});
-        degree[u]++;
-        degree[v]++;
-    }
-    for (int i = 1; i <= n; i++)
-    {
-        if (degree[i] & 1)
+        for(int j=0;j<n;j++)
         {
-            cout << "IMPOSSIBLE" << endl;
-            return;
+            cin>>mat[i][j];
         }
     }
-    vector<int> ans;
-    vector<bool> vis(m, false);
-    function<void(int)> dfs = [&](int node) -> void
+    vector<ll> dp(1<<n,0);
+    dp[0]=1;
+    for(int mask=0;mask<(1<<n)-1;mask++)
     {
-        for (auto it : adj[node])
+        int temp=__builtin_popcount(mask);
+        for(int j=0;j<n;j++)
         {
-            if (vis[it.second])
+            if(mat[temp][j] && !(mask&(1<<j)))
             {
-                continue;
+                dp[mask|(1<<j)]=(dp[mask]+dp[mask|(1<<j)])%M;
             }
-            vis[it.second] = true;
-            dfs(it.first);
         }
-        ans.push_back(node);
-    };
-    dfs(1);
-    if(ans.size()!=m+1)
-    {
-        cout<<"IMPOSSIBLE"<<endl;
-        return;
     }
-    for (int it : ans)
-    {
-        cout << it << " ";
-    }
+    cout<<dp[(1<<n)-1];
+
 }
- 
+
 int main()
 {
     godspeed;
-    ll t = 1;
+    ll t=1;
     while (t--)
     {
         solve();

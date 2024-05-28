@@ -31,58 +31,60 @@ typedef vector<ll> vl;
 #define godspeed                      \
     ios_base::sync_with_stdio(false); \
     cin.tie(NULL);
- 
+
 /* -----------------------------Code Begins from here-------------------------------------------*/
 void solve()
 {
     int n, m;
     cin >> n >> m;
-    vector<pair<int, int>> adj[n + 1];
-    vector<int> degree(n + 1, 0);
+    vector<int> adj[n + 1];
+    vector<int> in(n + 1, 0);
     for (int i = 0; i < m; i++)
     {
         int u, v;
         cin >> u >> v;
-        adj[u].push_back({v, i});
-        adj[v].push_back({u, i});
-        degree[u]++;
-        degree[v]++;
+        adj[u].push_back(v);
+        in[v]++;
     }
+    vector<int> topo;
+    queue<int> q;
     for (int i = 1; i <= n; i++)
     {
-        if (degree[i] & 1)
+        if (in[i] == 0)
         {
-            cout << "IMPOSSIBLE" << endl;
-            return;
+            q.push(i);
         }
     }
-    vector<int> ans;
-    vector<bool> vis(m, false);
-    function<void(int)> dfs = [&](int node) -> void
+    while (!q.empty())
     {
+        int node = q.front();
+        q.pop();
+        topo.push_back(node);
         for (auto it : adj[node])
         {
-            if (vis[it.second])
+            in[it]--;
+            if (in[it] == 0)
             {
-                continue;
+                q.push(it);
             }
-            vis[it.second] = true;
-            dfs(it.first);
         }
-        ans.push_back(node);
-    };
-    dfs(1);
-    if(ans.size()!=m+1)
-    {
-        cout<<"IMPOSSIBLE"<<endl;
-        return;
     }
-    for (int it : ans)
+    vector<int> dp(n + 1, 0);
+    for (auto it : topo)
     {
-        cout << it << " ";
+        for (auto child : adj[it])
+        {
+            dp[child] = max(dp[child], dp[it] + 1);
+        }
     }
+    int ans = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        ans = max(ans, dp[i]);
+    }
+    cout << ans << nline;
 }
- 
+
 int main()
 {
     godspeed;
