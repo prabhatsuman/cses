@@ -69,29 +69,91 @@ void _print(T t, V... v)
     cin.tie(NULL);
 
 /* -----------------------------Code Begins from here-------------------------------------------*/
+class SegmentTree
+{
+    vector<int> tree;
+    int n;
+
+public:
+    SegmentTree(int n, vector<int> &v)
+    {
+        this->n = n;
+        tree.resize(4 * n);
+        build(v, 0, n - 1, 0);
+    }
+    void build(vector<int> &v, int start, int end, int node)
+    {
+        if (start == end)
+        {
+            tree[node] = v[start];
+            return;
+        }
+        int mid = (start + end) / 2;
+        build(v, start, mid, 2 * node + 1);
+        build(v, mid + 1, end, 2 * node + 2);
+        tree[node] = merge(tree[2 * node + 1], tree[2 * node + 2]);
+    }
+    int merge(int node1, int node2)
+    {
+        return node1 + node2;
+    }
+    int query(int left, int right)
+    {
+        return Query(left, right, 0, n - 1, 0);
+    }
+    int Query(int left, int right, int start, int end, int node)
+    {
+        if (left <= start && right >= end)
+        {
+            return tree[node];
+        }
+        if (left > end || right < start)
+        {
+            return 0;
+        }
+        int mid = (start + end) / 2;
+        int ans1 = Query(left, right, start, mid, 2 * node + 1);
+        int ans2 = Query(left, right, mid + 1, end, 2 * node + 2);
+        return merge(ans1, ans2);
+    }
+    void update(int index, int value)
+    {
+        Update(index, value, 0, n - 1, 0);
+    }
+    void Update(int index, int value, int start, int end, int node)
+    {
+        if (start == end)
+        {
+            tree[node] = value;
+            return;
+        }
+        int mid = (start + end) / 2;
+        if (index <= mid)
+        {
+            Update(index, value, start, mid, 2 * node + 1);
+        }
+        else
+        {
+            Update(index, value, mid + 1, end, 2 * node + 2);
+        }
+        tree[node] = merge(tree[2 * node + 1], tree[2 * node + 2]);
+    }
+};
 void solve()
 {
-    int n, m;
-    cin >> n >> m;
-    vector<string> v(n);
+    int n;
+    cin >> n;
+    vector<int> v(n + 1, 0);
+    SegmentTree st(n + 1, v);
+
     for (int i = 0; i < n; i++)
     {
-        cin >> v[i];
+        int x;
+        cin >> x;
+        cout << st.query(x, n) << " ";
+        st.update(x, 1);
     }
-    vector<vector<int>> pre(n + 1, vector<int>(n + 1, 0));
-    for (int i = 1; i <= n; i++)
-    {
-        for (int j = 1; j <= n; j++)
-        {
-            pre[i][j] = pre[i - 1][j] + pre[i][j - 1] - pre[i - 1][j - 1] + (v[i - 1][j - 1] == '*');
-        }
-    }
-    while (m--)
-    {
-        int x1, y1, x2, y2;
-        cin >> x1 >> y1 >> x2 >> y2;
-        cout << pre[x2][y2] - pre[x1 - 1][y2] - pre[x2][y1 - 1] + pre[x1 - 1][y1 - 1] << nline;
-    }
+    cout << nline;
 }
 
 signed main()
